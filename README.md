@@ -52,7 +52,7 @@ pip install flash_attn-2.8.2+cu128torch2.8-cp312-cp312-linux_x86_64.whl
 
 > ⚠️ **Important**: vLLM can only serve one model at a time per instance. To switch models, you must stop the current server and start a new one.
 
-### Option 1: Asclepio-8B
+### Option 1: [Asclepio-8B](https://huggingface.co/Aquiles-ai/Asclepio-8B)
 
 Specialized model for medical reasoning and clinical decision-making:
 ```bash
@@ -65,7 +65,7 @@ vllm serve Aquiles-ai/Asclepio-8B \
   --gpu-memory-utilization=0.90
 ```
 
-### Option 2: Qwen2.5-VL-3B-Instruct-Img2Code
+### Option 2: [Qwen2.5-VL-3B-Instruct-Img2Code](https://huggingface.co/Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code)
 
 Specialized model for generating clean and functional HTML/CSS code from screenshots of web pages:
 ```bash
