@@ -73,9 +73,8 @@ vllm serve Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code \
   --gpu-memory-utilization=0.90
 ```
 
-<div class="callout-warning">
-⚠️ **Warning**: In the playground you can only interact with the model that you have launched with the vllm serve command, if you want to interact with the other model you have to kill the current execution and from there launch it with the indicated command
-</div>
+
+> ⚠️ **Warning**: In the playground you can only interact with the model that you have launched with the vllm serve command, if you want to interact with the other model you have to kill the current execution and from there launch it with the indicated command
 
 ## Environment variables for Aquiles-playground
 
