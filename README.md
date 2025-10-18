@@ -4,52 +4,57 @@
 
 <p align="center">
   <strong>Test our models locally from an easy-to-use chat interface</strong><br/>
-  🚀 Nextjs • vLLM • Async • OpenAI Client
+  🚀 Next.js • vLLM • Async • OpenAI Client
 </p>
 
-## Before running Aquiles-playground, perform these steps:
+## Prerequisites
 
-**Clone the repository and install all dependencies**
+Before running Aquiles-playground, ensure you have:
+- Python 3.12+
+- Node.js 18+
+- CUDA-compatible GPU with at least 24GB VRAM
+- CUDA 12.8 or compatible version
 
+## Installation
+
+### 1. Clone the repository and install dependencies
 ```bash
 git clone https://github.com/Aquiles-ai/aquiles-playground.git
 cd aquiles-playground
 npm install
 ```
 
-**To run the models with vLLM follow these steps**
+### 2. Install Python dependencies for vLLM
 
-Installing the libraries
-
+Install core libraries:
 ```bash
 uv pip install torch numpy packaging torchvision
 ```
-
 ```bash
 uv pip install --upgrade transformers ftfy kernels deepspeed vllm
 ```
 
-This is for the model **Qwen2.5-VL-3B-Instruct-Img2Code**
-
+**For Qwen2.5-VL-3B-Instruct-Img2Code model** (additional dependency):
 ```bash
 uv pip install qwen-vl-utils
 ```
 
-**If you want to use flash-attn for Pytorch 2.8+**
+### 3. (Optional) Install Flash Attention for PyTorch 2.8+
 
+For improved performance:
 ```bash
-
 wget https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.3.14/flash_attn-2.8.2+cu128torch2.8-cp312-cp312-linux_x86_64.whl
 
 pip install flash_attn-2.8.2+cu128torch2.8-cp312-cp312-linux_x86_64.whl
 ```
 
-#### Run our models with vLLM
+## Running the Models
 
-**It should be noted that you can only run one model at a time.**
+> ⚠️ **Important**: vLLM can only serve one model at a time per instance. To switch models, you must stop the current server and start a new one.
 
-In case you want to run **Asclepio-8B**, a specialized model for medical reasoning and clinical decision-making:
+### Option 1: Asclepio-8B
 
+Specialized model for medical reasoning and clinical decision-making:
 ```bash
 vllm serve Aquiles-ai/Asclepio-8B \
   --host 0.0.0.0 \
@@ -60,8 +65,9 @@ vllm serve Aquiles-ai/Asclepio-8B \
   --gpu-memory-utilization=0.90
 ```
 
-In case you want to run **Qwen2.5-VL-3B-Instruct-Img2Code**, a model specialized in generating clean and functional HTML/CSS code from screenshots of web pages:
+### Option 2: Qwen2.5-VL-3B-Instruct-Img2Code
 
+Specialized model for generating clean and functional HTML/CSS code from screenshots of web pages:
 ```bash
 vllm serve Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code \
   --host 0.0.0.0 \
@@ -73,29 +79,46 @@ vllm serve Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code \
   --gpu-memory-utilization=0.90
 ```
 
+## Configure Environment Variables
 
-> ⚠️ **Warning**: In the playground you can only interact with the model that you have launched with the vllm serve command, if you want to interact with the other model you have to kill the current execution and from there launch it with the indicated command
-
-## Environment variables for Aquiles-playground
-
-Since when starting the model servers with vLLM we get access to them through the OpenAI client, if you use the same commands that I left before you can copy the following without problems
-
-Create a **.env.local** file in the **aquiles-playground** folder with the following:
-
+Create a `.env.local` file in the `aquiles-playground` folder:
 ```env
 OPENAI_API_KEY="dummyapikey"
-OPENAI_BASE_URL="http://127.0.0.1:8000/v1" # You change this if you are running the models in lightning.ai and you are port viewer to something like "https://8000-your-url.cloudspaces.litng.ai/v1"
+OPENAI_BASE_URL="http://127.0.0.1:8000/v1"
 ```
 
-## Run Aquiles-Playground
+> **Note**: If running models on Lightning.ai with port forwarding, update `OPENAI_BASE_URL` to your forwarded URL (e.g., `https://8000-your-url.cloudspaces.litng.ai/v1`)
 
-Run the following command and log into your localhost on port 3000
+## Launch Aquiles-Playground
 
+Start the development server:
 ```bash
 npm run dev -- -H 0.0.0.0
 ```
 
-**You will see something like**
+Open your browser and navigate to `http://localhost:3000`
+
+**You should see:**
 
 ![imagepreview](image/preview.png)
 
+## Switching Models
+
+To switch between models:
+
+1. Stop the current vLLM server (press `Ctrl+C` in the terminal running vLLM)
+2. Start the desired model using the appropriate command from the "Running the Models" section
+3. Refresh your browser at `http://localhost:3000`
+
+## Troubleshooting
+
+**Out of Memory Error:**
+- Reduce `--gpu-memory-utilization` value (e.g., try 0.80 or 0.70)
+- Reduce `--max-model-len` value
+
+**Connection Error:**
+- Verify vLLM server is running and listening on port 8000
+- Check that `.env.local` has the correct `OPENAI_BASE_URL`
+
+**Port Already in Use:**
+- Change the port in both the vLLM command (`--port`) and `.env.local` file
