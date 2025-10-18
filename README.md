@@ -152,6 +152,9 @@ This project **(Aquiles-playground)** is licensed under the Apache License 2.0 -
     - [Aquiles-ai/Medical-Reasoning](https://huggingface.co/datasets/Aquiles-ai/Medical-Reasoning)
     - [HuggingFaceM4/WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight)
 
+**Training Platform:**
+- [Lightning.ai](https://lightning.ai) - GPU cloud platform used for model training
+
 <p align="center">
   Made with ❤️ by <a href="https://github.com/Aquiles-ai">Aquiles-ai</a>
 </p>
