@@ -122,3 +122,36 @@ To switch between models:
 
 **Port Already in Use:**
 - Change the port in both the vLLM command (`--port`) and `.env.local` file
+
+## 📚 Learn More
+
+### Fine-tuning Deep Dive: Medical Reasoning & Screenshot-to-Code
+
+Explore the complete journey of training Asclepio-8B and Qwen2.5-VL-3B-Instruct-Img2Code from scratch:
+
+🔗 **[Read the full article](https://fredy-rivera-dev-portafolio.vercel.app/blog/llm-finetuning)**
+
+**What you'll learn:**
+- LLM and Vision-Language Model architectures explained (with Manim animations)
+- Fine-tuning techniques: Full Fine-tuning, LoRA, and QLoRA
+- Introduction to Kronos - our fine-tuning framework
+- Step-by-step training process with code examples
+- Training metrics and performance analysis (wandb logs)
+- Memory usage and optimization on Lightning.ai
+
+## 📄 License
+
+This project **(Aquiles-playground)** is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## 🔗 Links
+
+- **Models:** 
+    - [Asclepio-8B](https://huggingface.co/Aquiles-ai/Asclepio-8B)
+    - [Qwen2.5-VL-3B-Instruct-Img2Code](https://huggingface.co/Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code)
+- **Datasets:**
+    - [Aquiles-ai/Medical-Reasoning](https://huggingface.co/datasets/Aquiles-ai/Medical-Reasoning)
+    - [HuggingFaceM4/WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight)
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/Aquiles-ai">Aquiles-ai</a>
+</p>
