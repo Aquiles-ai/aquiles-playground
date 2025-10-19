@@ -87,7 +87,7 @@ OPENAI_API_KEY="dummyapikey"
 OPENAI_BASE_URL="http://127.0.0.1:8000/v1"
 ```
 
-> **Note**: If running models on Lightning.ai with port forwarding, update `OPENAI_BASE_URL` to your forwarded URL (e.g., `https://8000-your-url.cloudspaces.litng.ai/v1`)
+> **Note**: If running models on Lightning.ai with "Port Viewer", update `OPENAI_BASE_URL` to your forwarded URL (e.g., `https://8000-your-url.cloudspaces.litng.ai/v1`)
 
 ## Launch Aquiles-Playground
 
