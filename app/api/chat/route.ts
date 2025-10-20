@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
     const stream = await openai.chat.completions.create({
       model: model,
       messages: messages,
+      max_completion_tokens: 8096,
       stream: true,
     })
 
