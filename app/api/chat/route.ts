@@ -1,6 +1,8 @@
 import type { NextRequest } from "next/server"
 import OpenAI from "openai"
 
+const MODEL_WITH_BUFFER = "Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code"
+
 export async function POST(req: NextRequest) {
   try {
     const { messages, model } = await req.json()
@@ -29,88 +31,93 @@ export async function POST(req: NextRequest) {
 
     const encoder = new TextEncoder()
 
+    const needsBuffer = model === MODEL_WITH_BUFFER
+
     const readableStream = new ReadableStream({
       async start(controller) {
-        let buffer = ""
-        let insideHtml = false
-        let htmlStarted = false
+        if (needsBuffer) {
+          let buffer = ""
+          let insideHtml = false
+          let htmlStarted = false
 
-        try {
-          for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content
-            if (content) {
-              buffer += content
+          try {
+            for await (const chunk of stream) {
+              const content = chunk.choices[0]?.delta?.content
+              if (content) {
+                buffer += content
 
-              // Detectar inicio de HTML
-              if (!htmlStarted && buffer.includes("<html")) {
-                insideHtml = true
-                htmlStarted = true
-                const htmlIndex = buffer.indexOf("<html")
-                const beforeHtml = buffer.substring(0, htmlIndex)
-                const fromHtml = buffer.substring(htmlIndex)
+                if (!htmlStarted && buffer.includes("<html")) {
+                  insideHtml = true
+                  htmlStarted = true
+                  const htmlIndex = buffer.indexOf("<html")
+                  const beforeHtml = buffer.substring(0, htmlIndex)
+                  const fromHtml = buffer.substring(htmlIndex)
 
-                // Enviar contenido antes de HTML
-                if (beforeHtml) {
-                  const data = JSON.stringify({ content: beforeHtml })
+                  if (beforeHtml) {
+                    const data = JSON.stringify({ content: beforeHtml })
+                    controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+                  }
+
+                  const codeBlockStart = JSON.stringify({ content: "```html\n" })
+                  controller.enqueue(encoder.encode(`data: ${codeBlockStart}\n\n`))
+
+                  const data = JSON.stringify({ content: fromHtml })
                   controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+
+                  buffer = ""
+                } else if (insideHtml && buffer.includes("</html>")) {
+                  const htmlEndIndex = buffer.indexOf("</html>") + 7
+                  const htmlContent = buffer.substring(0, htmlEndIndex)
+                  const afterHtml = buffer.substring(htmlEndIndex)
+                  const htmlData = JSON.stringify({ content: htmlContent })
+                  controller.enqueue(encoder.encode(`data: ${htmlData}\n\n`))
+                  const codeBlockEnd = JSON.stringify({ content: "\n```" })
+                  controller.enqueue(encoder.encode(`data: ${codeBlockEnd}\n\n`))
+                  if (afterHtml) {
+                    const afterData = JSON.stringify({ content: afterHtml })
+                    controller.enqueue(encoder.encode(`data: ${afterData}\n\n`))
+                  }
+
+                  insideHtml = false
+                  buffer = ""
+                } else if (!insideHtml && buffer.length > 100) {
+                  const data = JSON.stringify({ content: buffer })
+                  controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+                  buffer = ""
+                } else if (insideHtml && buffer.length > 0) {
+                  const data = JSON.stringify({ content: buffer })
+                  controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+                  buffer = ""
                 }
-
-                // Enviar apertura de bloque de código
-                const codeBlockStart = JSON.stringify({ content: "```html\n" })
-                controller.enqueue(encoder.encode(`data: ${codeBlockStart}\n\n`))
-
-                // Enviar el contenido HTML
-                const data = JSON.stringify({ content: fromHtml })
-                controller.enqueue(encoder.encode(`data: ${data}\n\n`))
-
-                buffer = ""
-              } else if (insideHtml && buffer.includes("</html>")) {
-                // Detectar fin de HTML
-                const htmlEndIndex = buffer.indexOf("</html>") + 7
-                const htmlContent = buffer.substring(0, htmlEndIndex)
-                const afterHtml = buffer.substring(htmlEndIndex)
-
-                // Enviar contenido HTML final
-                const htmlData = JSON.stringify({ content: htmlContent })
-                controller.enqueue(encoder.encode(`data: ${htmlData}\n\n`))
-
-                // Enviar cierre de bloque de código
-                const codeBlockEnd = JSON.stringify({ content: "\n```" })
-                controller.enqueue(encoder.encode(`data: ${codeBlockEnd}\n\n`))
-
-                // Enviar contenido después de HTML si existe
-                if (afterHtml) {
-                  const afterData = JSON.stringify({ content: afterHtml })
-                  controller.enqueue(encoder.encode(`data: ${afterData}\n\n`))
-                }
-
-                insideHtml = false
-                buffer = ""
-              } else if (!insideHtml && buffer.length > 100) {
-                // Si no estamos en HTML y el buffer es grande, enviar contenido normal
-                const data = JSON.stringify({ content: buffer })
-                controller.enqueue(encoder.encode(`data: ${data}\n\n`))
-                buffer = ""
-              } else if (insideHtml && buffer.length > 0) {
-                // Si estamos dentro de HTML, enviar el contenido acumulado
-                const data = JSON.stringify({ content: buffer })
-                controller.enqueue(encoder.encode(`data: ${data}\n\n`))
-                buffer = ""
               }
             }
-          }
+            if (buffer.length > 0) {
+              const data = JSON.stringify({ content: buffer })
+              controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+            }
 
-          // Enviar cualquier contenido restante en el buffer
-          if (buffer.length > 0) {
-            const data = JSON.stringify({ content: buffer })
-            controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+            controller.enqueue(encoder.encode("data: [DONE]\n\n"))
+            controller.close()
+          } catch (error) {
+            console.error("X Streaming error:", error)
+            controller.error(error)
           }
+        } else {
+          try {
+            for await (const chunk of stream) {
+              const content = chunk.choices[0]?.delta?.content
+              if (content) {
+                const data = JSON.stringify({ content })
+                controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+              }
+            }
 
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"))
-          controller.close()
-        } catch (error) {
-          console.error("[v0] Streaming error:", error)
-          controller.error(error)
+            controller.enqueue(encoder.encode("data: [DONE]\n\n"))
+            controller.close()
+          } catch (error) {
+            console.error("X Streaming error:", error)
+            controller.error(error)
+          }
         }
       },
     })
@@ -123,7 +130,7 @@ export async function POST(req: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("[v0] Chat API error:", error)
+    console.error("X Chat API error:", error)
     return new Response(JSON.stringify({ error: "Failed to process request" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
