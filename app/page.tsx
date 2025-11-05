@@ -12,6 +12,24 @@ type Message = {
   content: string | Array<{ type: "text" | "image_url"; text?: string; image_url?: { url: string } }>
 }
 
+function selectedModel_(id: string){
+  if(id == "asclepio"){
+    return "Aquiles-ai/Asclepio-8B"
+  }
+  else if(id == "qwen"){
+    return "Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code"
+  }
+  else if(id == "athenea"){
+    return "Aquiles-ai/Athenea-4B-Thinking"
+  }
+  else if(id == "athena-math"){
+    return "Aquiles-ai/Athenea-4B-Math"
+  }
+  else if(id == "athenea-coding"){
+    return "Aquiles-ai/Athenea-4B-Coding"
+  }
+}
+
 export default function AquilesPlayground() {
   const [selectedModel, setSelectedModel] = useState("asclepio")
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -29,6 +47,21 @@ export default function AquilesPlayground() {
       name: "Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code",
       description: "Vision model for HTML/CSS code generation from images",
     },
+    {
+      id: "athenea",
+      name:"Aquiles-ai/Athenea-4B-Thinking",
+      description:"Conversational model"
+    },
+    {
+      id:"athena-math",
+      name:"Aquiles-ai/Athenea-4B-Math",
+      description:"Model specialized in mathematical reasoning"
+    },
+    {
+      id:"athenea-coding",
+      name:"Aquiles-ai/Athenea-4B-Coding",
+      description:"Model specialized in solving code problems"
+    }
   ]
 
   const handleSendMessage = async (messageText: string, image: string | null) => {
@@ -68,7 +101,7 @@ export default function AquilesPlayground() {
         },
         body: JSON.stringify({
           messages: newMessages,
-          model: currentModel === "asclepio" ? "Aquiles-ai/Asclepio-8B" : "Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code",
+          model: selectedModel_(currentModel),
         }),
       })
 
@@ -80,7 +113,6 @@ export default function AquilesPlayground() {
       const decoder = new TextDecoder()
       let assistantMessage = ""
 
-      // Add empty assistant message that we'll update
       setMessages((prev) => [...prev, { role: "assistant", content: "" }])
 
       if (reader) {
@@ -98,7 +130,7 @@ export default function AquilesPlayground() {
 
               try {
                 const parsed = JSON.parse(data)
-                const content = parsed.content // Cambiado de parsed.choices[0]?.delta?.content
+                const content = parsed.content
                 if (content) {
                   assistantMessage += content
                   setMessages((prev) => {

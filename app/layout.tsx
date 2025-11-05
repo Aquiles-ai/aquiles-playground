@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Aquiles-playground",
-  description: "",
+  description: "Playground for testing open weight models trained by Aquiles-ai",
 };
 
 export default function RootLayout({

@@ -12,6 +12,17 @@ type ModelCardProps = {
   onSelect: () => void
 }
 
+function getL(id: string){
+  if(id == "asclepio"){
+    return "ASC"
+  }
+  else if(id == "qwen"){
+    return "QWN"
+  }else if(id == "athenea" || id == "athena-math" || id == "athenea-coding"){
+    return "ATH"
+  }
+}
+
 export function ModelCard({ model, isSelected, onSelect }: ModelCardProps) {
   return (
     <button
@@ -21,7 +32,7 @@ export function ModelCard({ model, isSelected, onSelect }: ModelCardProps) {
       }`}
     >
       <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-[10px] font-bold leading-none">{model.id === "asclepio" ? "ASC" : "QWN"}</span>
+        <span className="text-[10px] font-bold leading-none">{getL(model.id)}</span>
       </div>
       <div className="flex-1 text-left">
         <div className="font-medium text-sm">{model.name}</div>

@@ -3,6 +3,14 @@ import OpenAI from "openai"
 
 const MODEL_WITH_BUFFER = "Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code"
 
+const SYSTEM_PROMPTS: Record<string, string> = {
+  "Aquiles-ai/Athenea-4B-Thinking": "You are an AI assistant specializing in deep reasoning and critical thinking named Athenea, created by Aquiles-ai. Analyze each problem from multiple perspectives and in multiple languages, consider the implications, and provide well-founded answers. IMPORTANT: Always wrap your thinking process between <think> and </think> tags.",
+  
+  "Aquiles-ai/Athenea-4B-Math": "You are an AI assistant specializing in mathematics and solving math problems named Athenea, created by Aquiles-ai. Provide clear, step-by-step explanations, show your work, and verify your calculations. Use appropriate mathematical notation when necessary. IMPORTANT: Always wrap your thinking process between <think> and </think> tags.",
+  
+  "Aquiles-ai/Athenea-4B-Coding": "You are an AI assistant specializing in programming named Athenea, created by Aquiles-ai. Write clean, well-documented code following best practices. Explain your reasoning and provide examples where appropriate. IMPORTANT: Always wrap your thinking process between <think> and </think> tags."
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { messages, model } = await req.json()
@@ -22,9 +30,24 @@ export async function POST(req: NextRequest) {
       baseURL: baseUrl,
     })
 
+    let finalMessages = messages
+    const systemPromptContent = SYSTEM_PROMPTS[model]
+
+    if (systemPromptContent) {
+      const hasSystemPrompt = messages.some((msg: any) => msg.role === "system")
+      
+      if (!hasSystemPrompt) {
+        const systemPrompt = {
+          role: "system",
+          content: systemPromptContent
+        }
+        finalMessages = [systemPrompt, ...messages]
+      }
+    }
+
     const stream = await openai.chat.completions.create({
       model: model,
-      messages: messages,
+      messages: finalMessages,
       max_completion_tokens: 8096,
       stream: true,
     })

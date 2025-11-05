@@ -20,6 +20,8 @@ export function ChatArea({ messages, selectedModel, onPromptClick }: ChatAreaPro
       return "I'm asclepio—how can I help?"
     } else if (selectedModel === "qwen") {
       return "I'm qwen—how can I help?"
+    } else if(selectedModel == "athenea" || selectedModel == "athena-math" || selectedModel == "athenea-coding"){
+      return "I'm athenea—how can I help?"
     }
     return "How can I help?"
   }

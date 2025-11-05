@@ -28,10 +28,10 @@ npm install
 
 Install core libraries:
 ```bash
-uv pip install torch numpy packaging torchvision
+uv pip install torch==2.8 numpy packaging torchvision
 ```
 ```bash
-uv pip install --upgrade transformers ftfy kernels deepspeed vllm
+uv pip install transformers ftfy kernels deepspeed vllm
 ```
 
 **For Qwen2.5-VL-3B-Instruct-Img2Code model** (additional dependency):
@@ -77,6 +77,64 @@ vllm serve Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code \
   --limit-mm-per-prompt '{"image":2,"video":0}' \
   --max-model-len=16384 \
   --gpu-memory-utilization=0.90
+```
+
+### The Athenea model family
+
+To run this family of models, you first need to create a chat template to avoid inference errors with the reasoning tags. Create a file named `chat_template.jinja` with the following content:
+
+```jinja
+{% for message in messages %}
+{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}
+{% endfor %}
+{% if add_generation_prompt %}
+{{ '<|im_start|>assistant\n' }}
+{% endif %}
+```
+
+#### Option 1: [Athenea-4B-Coding](https://huggingface.co/Aquiles-ai/Athenea-4B-Coding)
+
+Model specialized in solving code problems.
+
+```bash
+vllm serve Aquiles-ai/Athenea-4B-Coding \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --api-key dummyapikey \
+  --max-model-len=16384 \
+  --async-scheduling \
+  --gpu-memory-utilization=0.90 \
+  --chat-template chat_template.jinja
+```
+
+#### Option 2: [Athenea-4B-Math](https://huggingface.co/Aquiles-ai/Athenea-4B-Math)
+
+Model specialized in mathematical reasoning
+
+```bash
+vllm serve Aquiles-ai/Athenea-4B-Math \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --api-key dummyapikey \
+  --max-model-len=16384 \
+  --async-scheduling \
+  --gpu-memory-utilization=0.90 \
+  --chat-template chat_template.jinja
+```
+
+#### Option 3: [Athenea-4B-Thinking](https://huggingface.co/Aquiles-ai/Athenea-4B-Thinking)
+
+Conversational model
+
+```bash
+vllm serve Aquiles-ai/Athenea-4B-Thinking \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --api-key dummyapikey \
+  --max-model-len=16384 \
+  --async-scheduling \
+  --gpu-memory-utilization=0.90 \
+  --chat-template chat_template.jinja
 ```
 
 ## Configure Environment Variables
