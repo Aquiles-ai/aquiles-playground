@@ -206,7 +206,7 @@ This project **(Aquiles-playground)** is licensed under the Apache License 2.0 -
 - **Models:** 
     - [Asclepio-8B](https://huggingface.co/Aquiles-ai/Asclepio-8B)
     - [Qwen2.5-VL-3B-Instruct-Img2Code](https://huggingface.co/Aquiles-ai/Qwen2.5-VL-3B-Instruct-Img2Code)
-    - [Athenea models](https://huggingface.co/collections/Aquiles-ai/athenea)
+    - [Athenea models](https://huggingface.co/collections/Aquiles-ai/athenea) 
 
 - **Datasets:**
     - [Aquiles-ai/Medical-Reasoning](https://huggingface.co/datasets/Aquiles-ai/Medical-Reasoning)
